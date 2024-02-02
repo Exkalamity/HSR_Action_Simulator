@@ -11,7 +11,7 @@ class Qingque(Character):
     self.tiles = 0
     self.skill_uses = 0
     self.tile_battle = True
-    self.draws = 0
+    self.draws = None
     self.autarkey_multiplier = 1
     self.hidden_hand = 8
     self.behavior = behavior #Agressive, Emergency, Auto Battle

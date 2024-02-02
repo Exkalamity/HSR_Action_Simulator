@@ -25,9 +25,9 @@ class Sparkle(Character):
     if recipient is None:
       recipient = self.recipient
     if recipient.action_gauge > 0.5 * recipient.action_value:
-      adv = 0.5 * recipient.action_value
+      adv = 0.5 * recipient.action_value - 0.1
     else:
-      adv = recipient.action_gauge
+      adv = recipient.action_gauge - 0.1
     recipient.action_gauge -= adv
     self.energy += 30 *self.energy_regen
     arena.sp -= 1

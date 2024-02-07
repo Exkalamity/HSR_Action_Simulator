@@ -124,4 +124,6 @@ class Qingque(Character):
       else:
         pass
 
+class Qingque_Probabilities():
+  pass
   

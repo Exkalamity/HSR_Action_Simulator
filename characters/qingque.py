@@ -1,5 +1,6 @@
 from characters.base_character import Character
 import numpy as np
+from utils.probability_tables import make_fail_table, make_sp_table, make_state_table, make_success_table
 
 class Qingque(Character):
   def __init__(self, behavior = "Agressive", eidolon = 6, **kwargs):
@@ -21,6 +22,12 @@ class Qingque(Character):
     self.maximum_damage = 0
     self.ult_expected_damage = 0
     self.ult_max_damage = 0
+    self.state_vector = 0
+    self.states = ["4-0-0",	"3-1-0",	"3-0-0",	"2-2-0",	"2-1-1",	"2-1-0",	"2-0-0",	"1-1-1",	"1-1-0",	"1-0-0",	"0-0-0"]
+    self.fail_table = make_fail_table()
+    self.success_table = make_success_table()
+    self.state_table = make_state_table()
+    self.sp_table = make_sp_table()
     
   def basic(self, verbose = None):
     arena = self.arena
@@ -124,6 +131,16 @@ class Qingque(Character):
       else:
         pass
 
-class Qingque_Probabilities():
-  pass
+  def check_hh(self, sp = None, tiles = None):
+    arena = self.arena
+    if sp is None:
+      sp = arena.sp
+    if tiles is None:
+      tiles = self.tiles
+    # self.state_vector = self.state_table.loc[self.state_table["Tiles Drawn"] == tiles]
+    # for state in self.states:
+    #   pass
+    
+    
+
   

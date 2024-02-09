@@ -32,7 +32,10 @@ class Character():
     self.effect_hit_rate = EHR
     self.effect_resistance = Res
     self.speed = Spd
-    self.action_value = 10000/self.speed
+    try:
+      self.action_value = 10000/self.speed
+    except TypeError:
+      self.action_value = 100
     self.action_gauge = self.action_value
     self.energy_regen = ER
     self.actions = 0

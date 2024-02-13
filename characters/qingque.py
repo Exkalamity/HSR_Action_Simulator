@@ -28,6 +28,12 @@ class Qingque(Character):
     self.success_table = make_success_table()
     self.state_table = make_state_table()
     self.sp_table = make_sp_table()
+    self.success_vector = None
+    self.fail_vector = None
+    self.sp_vector = None
+    self.sp_vector_clean = None
+    self.fail_chance = None
+    self.likely_SP = None
     
   def basic(self, verbose = None):
     arena = self.arena
@@ -137,10 +143,19 @@ class Qingque(Character):
       sp = arena.sp
     if tiles is None:
       tiles = self.tiles
-    # self.state_vector = self.state_table.loc[self.state_table["Tiles Drawn"] == tiles]
-    # for state in self.states:
-    #   pass
-    
-    
-
-  
+    self.state_vector = self.state_table.loc[tiles]
+    if sp == 0: #If no SP, setting fail change to 0 and success chance and SP usage to 0
+      self.success_vector = 0*self.state_vector
+      self.fail_vector = self.success_vector + 1
+      self.sp_vector = self.success_vector
+    else:
+      self.fail_vector = self.fail_table.iloc[sp-1]*self.state_vector
+      self.sp_vector = self.sp_table.iloc[sp-1]*self.state_vector
+      self.sp_vector_clean = self.sp_table.iloc[sp-1]
+      for i in range(sp):
+        if i == 0:
+          self.success_vector = self.success_table.iloc[i]
+        else:
+          self.success_vector += self.success_table.iloc[i]
+      self.success_vector *= self.state_vector
+    self.fail_chance = 1-sum(self.fail_vector)

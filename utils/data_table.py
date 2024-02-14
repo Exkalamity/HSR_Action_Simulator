@@ -9,10 +9,10 @@ class Data_Table():
 class Action_Table(Data_Table):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.df = pd.DataFrame(columns = ["Name", "Cycle", "Action Gauge", "Current SP", "Current Energy", "Action"])
+        self.df = pd.DataFrame(columns = ["Name", "Cycle", "Action Gauge", "Current SP", "Current Energy", "Action", "SP Gain"])
         self.sp_now = None
 
-    def append(self, arena, chara, action):
+    def append(self, arena, chara, action, sp_change):
         new_row = {"Name":chara.name, "Cycle":arena.cycle, "Action Gauge":arena.action_gauge, "Current SP":arena.sp, 
                    "Current Energy":chara.energy, "Action":action}
         self.df = self.df.append(new_row, ignore_index = True)

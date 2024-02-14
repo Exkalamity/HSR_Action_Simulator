@@ -3,7 +3,7 @@ import numpy as np
 from utils.probability_tables import make_fail_table, make_sp_table, make_state_table, make_success_table
 
 class Qingque(Character):
-  def __init__(self, behavior = "Agressive", eidolon = 6, **kwargs):
+  def __init__(self, behavior = "Agressive", eidolon = 6, threshold = 0.7, **kwargs):
     super().__init__(**kwargs)
     self.name = "Qingque"
     self.max_energy = 140
@@ -14,7 +14,7 @@ class Qingque(Character):
     self.tile_battle = True
     self.draws = None
     self.autarkey_multiplier = 1
-    self.hidden_hand = 8
+    self.hidden_hand = True
     self.behavior = behavior #Agressive, Emergency, Auto Battle
     self.eidolon = eidolon
     self.autarkey_chance = 0.25
@@ -22,18 +22,15 @@ class Qingque(Character):
     self.maximum_damage = 0
     self.ult_expected_damage = 0
     self.ult_max_damage = 0
-    self.state_vector = 0
+    self.threshold = threshold
     self.states = ["4-0-0",	"3-1-0",	"3-0-0",	"2-2-0",	"2-1-1",	"2-1-0",	"2-0-0",	"1-1-1",	"1-1-0",	"1-0-0",	"0-0-0"]
     self.fail_table = make_fail_table()
     self.success_table = make_success_table()
     self.state_table = make_state_table()
     self.sp_table = make_sp_table()
-    self.success_vector = None
-    self.fail_vector = None
-    self.sp_vector = None
-    self.sp_vector_clean = None
-    self.fail_chance = None
-    self.likely_SP = None
+    self.success_chance = None
+    self.likely_multiplier = None
+    self.average_multiplier = None
     
   def basic(self, verbose = None):
     arena = self.arena
@@ -137,25 +134,40 @@ class Qingque(Character):
       else:
         pass
 
-  def check_hh(self, sp = None, tiles = None):
+  def check_hh(self, sp = None, tiles = None, threshold = None):
     arena = self.arena
     if sp is None:
       sp = arena.sp
     if tiles is None:
       tiles = self.tiles
-    self.state_vector = self.state_table.loc[tiles]
-    if sp == 0: #If no SP, setting fail change to 0 and success chance and SP usage to 0
-      self.success_vector = 0*self.state_vector
-      self.fail_vector = self.success_vector + 1
-      self.sp_vector = self.success_vector
-    else:
-      self.fail_vector = self.fail_table.iloc[sp-1]*self.state_vector
-      self.sp_vector = self.sp_table.iloc[sp-1]*self.state_vector
-      self.sp_vector_clean = self.sp_table.iloc[sp-1]
+    if threshold is None:
+      threshold = self.threshold 
+    state_vector = self.state_table.loc[tiles]
+    self.success_chance = 0
+    self.average_multiplier = 0
+    self.likely_multiplier = 0
+    self.hidden_hand = False
+    if sp > 0: #If no SP, setting fail change to 0 and success chance and SP usage to 0
+      fail_vector = self.fail_table.iloc[sp-1].copy()*state_vector.copy()
+      sp_vector = self.sp_table.iloc[sp-1].copy()
+      average_SP = 0
+      success_vector = 0
       for i in range(sp):
         if i == 0:
-          self.success_vector = self.success_table.iloc[i]
+          success_vector = self.success_table.iloc[i].copy()
+          average_SP = self.success_table.iloc[i].copy() * (i+1)
         else:
-          self.success_vector += self.success_table.iloc[i]
-      self.success_vector *= self.state_vector
-    self.fail_chance = 1-sum(self.fail_vector)
+          average_SP += self.success_table.iloc[i].copy() * (i+1)
+          success_vector += self.success_table.iloc[i].copy()
+      average_SP *= state_vector.copy()
+      #print(average_SP)
+      success_vector *= state_vector.copy()
+      print(success_vector)
+      self.success_chance = 1-sum(fail_vector)
+      self.average_multiplier = sum(average_SP)
+      if self.success_chance > threshold:
+        self.likely_multiplier = sp_vector[success_vector.idxmax()]
+        self.hidden_hand = True
+      else:
+        self.likely_multiplier = 0
+        self.hidden_hand = False

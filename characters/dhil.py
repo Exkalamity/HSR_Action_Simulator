@@ -1,7 +1,8 @@
 from characters.base_character import Character
+import numpy as np
 
 class DHIL(Character):
-  def __init__(self, **kwargs):
+  def __init__(self, s1 = False, **kwargs):
     super().__init__(**kwargs)
     self.name = "Dan Heng IL"
     self.skill_charges = 0
@@ -10,6 +11,8 @@ class DHIL(Character):
     if self.energy  == "MoC":
       self.energy = 0.5*self.max_energy
     self.basic_level = 0
+    self.og_energy_regen = self.energy_regen
+    self.s1 = s1
 
   def skill(self, verbose = None):
     arena = self.arena
@@ -23,8 +26,16 @@ class DHIL(Character):
     if verbose:
       print(f"DHIL enhances to level {self.basic_level}")
 
-  def enhanced_basic(self, verbose = None):
+  def enhanced_basic(self, s1 = None, verbose = None):
     arena = self.arena
+    if s1 is None:
+      s1 = self.s1
+    if s1:
+        s1_bonus = np.min([self.basic_level, 2])
+    else:
+        s1_bonus = 0
+    self.energy_regen = self.og_energy_regen + self.og_energy_regen * 0.06*s1_bonus
+
     if verbose == None:
       verbose = self.verbose
     if self.basic_level == 0:

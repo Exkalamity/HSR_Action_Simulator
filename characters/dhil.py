@@ -52,7 +52,7 @@ class DHIL(Character):
   def ult(self, verbose = None):
     if verbose is None:
       verbose = self.verbose
-    self.energy = 5
+    self.energy = 5*self.energy_regen
     self.skill_charges += 2
     if self.skill_charges >3:
       self.skill_charges = 3

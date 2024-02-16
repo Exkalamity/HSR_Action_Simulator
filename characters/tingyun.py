@@ -46,7 +46,7 @@ class Tingyun(Character):
       verbose = self.verbose
     if recipient is None:
       recipient = self.recipient
-    self.energy = 5
+    self.energy = 5*self.energy_regen
     recipient.energy += self.ult_energy
     if verbose:
       print("Tingyun uses Ult!")

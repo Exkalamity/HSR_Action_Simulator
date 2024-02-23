@@ -5,8 +5,8 @@ from characters.sparkle import Sparkle
 from utils.arena import Arena
 import numpy as np
 
-def QQ_Mono_Quantum(action_df, prob_df, cycles = 10, verbose = False):
-    arena, qq, spk, sw, fx = Initialize_QQ_Mono_Quantum()
+def QQ_Mono_Quantum(arena, qq, spk, sw, fx, action_df, prob_df, cycles = 10, verbose = False):
+
     if spk.tech:
         arena.sp += 3
         spk.tech = False

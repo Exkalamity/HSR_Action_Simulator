@@ -4,6 +4,7 @@ from characters.silver_wolf import Silver_Wolf
 from characters.sparkle import Sparkle
 from utils.arena import Arena
 import numpy as np
+from utils.probability_tables import pd_exp, prob_at_least
 
 def QQ_Mono_Quantum(arena, qq, spk, sw, fx, action_df, prob_df, cycles = 10, verbose = False):
 

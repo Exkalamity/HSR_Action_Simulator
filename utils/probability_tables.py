@@ -31,3 +31,6 @@ def make_success_table():
     df_T = df_T.drop(df_T.index[0])
     return df_T
     
+def make_transition_matrix():
+    df = pd.read_csv("utils\probability_data\Transition_Matrix.csv", index_col=0)
+    return df

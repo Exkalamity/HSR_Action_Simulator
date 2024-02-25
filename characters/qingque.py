@@ -1,6 +1,6 @@
 from characters.base_character import Character
 import numpy as np
-from utils.probability_tables import make_fail_table, make_sp_table, make_state_table, make_success_table
+from utils.probability_tables import make_fail_table, make_sp_table, make_state_table, make_success_table, make_transition_matrix, pd_exp, prob_at_least
 
 class Qingque(Character):
   def __init__(self, behavior = "Agressive", eidolon = 6, threshold = 0.7, **kwargs):
@@ -32,45 +32,54 @@ class Qingque(Character):
     self.success_chance = None
     self.likely_multiplier = None
     self.average_multiplier = None
-    
-  def check_hh(self, sp = None, tiles = None, threshold = None):
+    self.p_4_draw = None
+    self.p_3_draw = None
+
+  def check_hh_w_leasts(self, sp = None, tiles = None):
     arena = self.arena
     if sp is None:
       sp = int(arena.sp)
     if tiles is None:
       tiles = self.tiles
-    if threshold is None:
-      threshold = self.threshold 
-    state_vector = self.state_table.loc[tiles]
-    self.success_chance = 0
-    self.average_multiplier = 0
-    self.likely_multiplier = 0
-    self.hidden_hand = False
-    if sp > 0: #If no SP, setting fail change to 0 and success chance and SP usage to 0
-      fail_vector = self.fail_table.iloc[sp-1].copy()*state_vector.copy()
-      sp_vector = self.sp_table.iloc[sp-1].copy()
-      average_SP = 0
-      success_vector = 0
-      for i in range(sp):
-        if i == 0:
-          success_vector = self.success_table.iloc[i].copy()
-          average_SP = self.success_table.iloc[i].copy() * (i+1)
-        else:
-          average_SP += self.success_table.iloc[i].copy() * (i+1)
-          success_vector += self.success_table.iloc[i].copy()
-      average_SP *= state_vector.copy()
-      #print(average_SP)
-      success_vector *= state_vector.copy()
-      self.success_vector = success_vector.copy()
-      #print(success_vector)
-      self.success_chance = 1-sum(fail_vector)
-      self.average_multiplier = sum(average_SP)
-      if self.success_chance > threshold:
-        self.likely_multiplier = sp_vector[success_vector.idxmax()]
-        self.hidden_hand = True
-      else:
-        self.likely_multiplier = 0
-        self.hidden_hand = False
+  
+  # def check_hh(self, sp = None, tiles = None, threshold = None):
+  #   arena = self.arena
+  #   if sp is None:
+  #     sp = int(arena.sp)
+  #   if tiles is None:
+  #     tiles = self.tiles
+  #   if threshold is None:
+  #     threshold = self.threshold 
+  #   state_vector = self.state_table.loc[tiles]
+  #   self.success_chance = 0
+  #   self.average_multiplier = 0
+  #   self.likely_multiplier = 0
+  #   self.hidden_hand = False
+  #   if sp > 0: #If no SP, setting fail change to 0 and success chance and SP usage to 0
+  #     fail_vector = self.fail_table.iloc[sp-1].copy()*state_vector.copy()
+  #     sp_vector = self.sp_table.iloc[sp-1].copy()
+  #     average_SP = 0
+  #     success_vector = 0
+  #     for i in range(sp):
+  #       if i == 0:
+  #         success_vector = self.success_table.iloc[i].copy()
+  #         average_SP = self.success_table.iloc[i].copy() * (i+1)
+  #       else:
+  #         average_SP += self.success_table.iloc[i].copy() * (i+1)
+  #         success_vector += self.success_table.iloc[i].copy()
+  #     average_SP *= state_vector.copy()
+  #     #print(average_SP)
+  #     success_vector *= state_vector.copy()
+  #     self.success_vector = success_vector.copy()
+  #     #print(success_vector)
+  #     self.success_chance = 1-sum(fail_vector)
+  #     self.average_multiplier = sum(average_SP)
+  #     if self.success_chance > threshold:
+  #       self.likely_multiplier = sp_vector[success_vector.idxmax()]
+  #       self.hidden_hand = True
+  #     else:
+  #       self.likely_multiplier = 0
+  #       self.hidden_hand = False
     
   # def basic(self, verbose = None):
   #   arena = self.arena

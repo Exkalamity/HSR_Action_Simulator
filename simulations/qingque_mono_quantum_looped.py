@@ -56,7 +56,7 @@ def QQ_Mono_Quantum(arena, qq, spk, sw, fx, action_df, stat_df, prob_df, run_num
         #Silver Wolf's actions
             if verbose:
                 print("Silver Wolf takes a turn")
-            if arena.sp > 0 or spk.energy >= spk.max_energy:
+            if arena.sp > 0 and sw.skill_counter == 0 or spk.energy >= spk.max_energy:
                 action_df.add_row(arena, sw, "Skill", -1)
                 sw.skill(verbose = verbose)
             else:
@@ -75,6 +75,8 @@ def QQ_Mono_Quantum(arena, qq, spk, sw, fx, action_df, stat_df, prob_df, run_num
             if spk.energy >= spk.max_energy:
                 action_df.add_row(arena, spk, "Ultimate", 4)
                 spk.ult(verbose = verbose)
+            if arena.sp >= 7:
+                arena.sp = 7
             if arena.sp > 0:
                 action_df.add_row(arena, spk, "Skill", -1)
                 spk.skill(verbose = verbose)
@@ -116,7 +118,7 @@ def QQ_Mono_Quantum(arena, qq, spk, sw, fx, action_df, stat_df, prob_df, run_num
                     print("Failure!")
                 sp_consumed = int(arena.sp)
                 if qq.eidolon == 6:
-                    sp_consumed +=1
+                    sp_consumed -=1
                 if sp_consumed < 0:
                     sp_consumed = 0
                 qq.draws = sp_consumed

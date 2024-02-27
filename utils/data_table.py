@@ -32,5 +32,5 @@ class Qingque_Statistics_Table(Data_Table):
         super().__init__(**kwargs)
         self.df = pd.DataFrame(columns = ["Sim #", "Turn", "Cycle", "Action Gauge", "Current SP", "Current Tiles", "# Draws", "Hidden Hand Win Rate"])
     def add_row(self, arena, chara, sim, tiles, used):
-        new_row = {"Sim #":sim, "Turn":chara.turn, "Cycle":arena.cycle, "Action Gauge":arena.action_gauge, "Current SP":arena.sp, "Current Tiles":tiles, "# Draws":chara.draws, "Hidden Hand":100*chara.hidden_hand}
+        new_row = {"Sim #":sim, "Turn":chara.turn, "Cycle":arena.cycle, "Action Gauge":arena.action_gauge, "Current SP":arena.sp, "Current Tiles":tiles, "# Draws":chara.draws, "Hidden Hand Win Rate":chara.hidden_hand}
         self.df = pd.concat([self.df, pd.DataFrame([new_row])], ignore_index = True)

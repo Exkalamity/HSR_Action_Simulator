@@ -35,6 +35,8 @@ class Silver_Wolf(Character):
       self.arena = arena
     if verbose is None:
       self.verbose = verbose
+    if verbose:
+      print("Silver Wolf uses Ult! SP -1")
     
   
   def update_stats(self, verbose = None):

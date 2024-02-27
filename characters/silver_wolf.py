@@ -8,7 +8,7 @@ class Silver_Wolf(Character):
     self.max_energy = 110
     if  self.energy == "MoC":
       self.energy = 0.5*self.max_energy
-    self.skill_counter = -1
+    self.skill_counter = 0
   
   def basic(self, arena = None, verbose = None):
     if arena is None:

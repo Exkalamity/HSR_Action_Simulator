@@ -58,6 +58,9 @@ class Sparkle(Character):
           print("SP + 4!")
     else:
       arena.sp +=4
+      if verbose:
+          print("Sparkle uses Ult!")
+          print("SP + 4!")
 
 
   def update_stats(self, verbose = None):

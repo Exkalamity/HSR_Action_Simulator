@@ -6,7 +6,7 @@ from utils.arena import Arena
 import numpy as np
 import random as rand
 
-def QQ_Mono_Quantum(arena, qq, spk, sw, fx, action_df, stat_df, prob_df, run_num, cycles = 10, verbose = False):
+def QQ_Mono_Quantum(arena, qq, spk, sw, fx, action_df, stat_df, prob_df, run_num, cycles = 10, verbose = False, ult_sp_threshold = 4):
 
     if spk.tech:
         arena.sp += 3
@@ -40,7 +40,7 @@ def QQ_Mono_Quantum(arena, qq, spk, sw, fx, action_df, stat_df, prob_df, run_num
         #Fu Xuan's actions
             if verbose:
                 print("Fu Xuan takes a turn")
-            if arena.sp > 0 and fx.skill_counter < 0:
+            if arena.sp > 0 and fx.skill_counter < 0 or spk.energy >= spk.max_energy:
                 action_df.add_row(arena, fx, "Skill", -1)
                 ##TODO: Add FX's 12% CR Buff:
                 fx.skill(verbose = verbose)
@@ -57,10 +57,9 @@ def QQ_Mono_Quantum(arena, qq, spk, sw, fx, action_df, stat_df, prob_df, run_num
         #Silver Wolf's actions
             if verbose:
                 print("Silver Wolf takes a turn")
-            if arena.sp > 0 and sw.skill_counter <= 0:
+            if arena.sp > 0 and sw.skill_counter <= 0 or spk.energy >= spk.max_energy:
                 action_df.add_row(arena, sw, "Skill", -1)
                 sw.skill(verbose = verbose)
-
             else:
                 action_df.add_row(arena, sw, "Basic", 1)
                 sw.basic(verbose = verbose)
@@ -73,16 +72,15 @@ def QQ_Mono_Quantum(arena, qq, spk, sw, fx, action_df, stat_df, prob_df, run_num
         #Sparkle's actions
             if verbose:
                 print("Sparkle takes a turn:")
+            if spk.energy >= spk.max_energy:
+                action_df.add_row(arena, spk, "Ultimate", 4)
+                spk.ult(verbose = verbose)
             if arena.sp > 0 and spk.turn > 1 or spk.turn == 1 and spk.t1_skill == True:
                 action_df.add_row(arena, spk, "Skill", -1)
                 spk.skill(verbose = verbose)
             else:
                 action_df.add_row(arena, spk, "Basic", 1)
                 spk.basic(verbose = verbose)
-            if spk.energy >= spk.max_energy:
-                action_df.add_row(arena, spk, "Ultimate", 4)
-                spk.ult(verbose = verbose)
-                
             
             spk.update_buffs()
             spk.action_reset()
@@ -97,6 +95,11 @@ def QQ_Mono_Quantum(arena, qq, spk, sw, fx, action_df, stat_df, prob_df, run_num
             roll = rand.random()
             if verbose:
                 print(f"P to beat is {roll}")
+            if spk.energy >= spk.max_energy:
+                action_df.add_row(arena, spk, "Ultimate", 4)
+                spk.ult(verbose = verbose)
+                sparkle_ult = True
+                
             for i in range(1, arena.sp + 1):
                 check = qq.f_success(sp = i)
                 if verbose:
@@ -131,6 +134,11 @@ def QQ_Mono_Quantum(arena, qq, spk, sw, fx, action_df, stat_df, prob_df, run_num
                     sp_consumed -= 1
                 action_df.add_row(arena, qq, "Enhanced Basic", sp_consumed)
                 qq.tiles = 0
+            if arena.sp > 7 and sparkle_ult: #Undo Sparkle's Ult if too much SP
+                action_df.df.drop(action_df.df.tail(2).index[0], inplace=True)
+                spk.energy = 120
+                arena.sp -=1
+            sparkle_ult = False
             stat_df.add_row(arena, qq, run_num, passive_tiles, sp_consumed)
             #prob_df.add_row(arena, qq, passive_tiles, sp_consumed, qq.hidden_hand, roll)
             if verbose:

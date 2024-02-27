@@ -32,7 +32,7 @@ def QQ_Mono_Quantum(arena, qq, spk, sw, fx, action_df, stat_df, prob_df, run_num
         
         #Qingque's Passive Tile Draw
         qq.tiles += 1 
-        if arena.sp >7:
+        if arena.sp >=7:
             arena.sp = 7
         #Determine the next character to act based on who has 0 action gauge
         if fx.action_gauge == 0:

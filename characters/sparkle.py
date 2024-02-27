@@ -7,6 +7,7 @@ class Sparkle(Character):
     self.max_energy = 110
     self.recipient  = recipient
     self.tech = tech
+    self.skill_counter = 2
     self.bronya_lc = broyna_lc
     self.ult_counter = 1
     self.t1_skill = t1_skill

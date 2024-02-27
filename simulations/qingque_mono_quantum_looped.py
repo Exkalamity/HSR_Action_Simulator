@@ -75,10 +75,12 @@ def QQ_Mono_Quantum(arena, qq, spk, sw, fx, action_df, stat_df, prob_df, run_num
             if spk.energy >= spk.max_energy:
                 action_df.add_row(arena, spk, "Ultimate", 4)
                 spk.ult(verbose = verbose)
-            if arena.sp > 0 and spk.turn > 1 or spk.turn == 1 and spk.t1_skill == True:
+            if arena.sp > 0 and spk.skill_counter > 0:
                 action_df.add_row(arena, spk, "Skill", -1)
                 spk.skill(verbose = verbose)
+                spk.skill_counter -= 1
             else:
+                spk.skill_counter = 2
                 action_df.add_row(arena, spk, "Basic", 1)
                 spk.basic(verbose = verbose)
             

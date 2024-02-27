@@ -123,7 +123,7 @@ def QQ_Mono_Quantum(arena, qq, spk, sw, fx, action_df, stat_df, prob_df, run_num
                     sp_consumed = 0
                 qq.draws = sp_consumed
                 qq.hidden_hand = False
-                action_df.add_row(arena, qq, "Basic", sp_consumed)
+                action_df.add_row(arena, qq, "Basic", -sp_consumed)
             if qq.hidden_hand == True:
                 #qq.check_hh(threshold = sp_consumed)
                 if sp_consumed > 1:
@@ -134,7 +134,7 @@ def QQ_Mono_Quantum(arena, qq, spk, sw, fx, action_df, stat_df, prob_df, run_num
                 qq.draws = sp_consumed
                 if qq.eidolon >= 6:
                     sp_consumed -= 1
-                action_df.add_row(arena, qq, "Enhanced Basic", sp_consumed)
+                action_df.add_row(arena, qq, "Enhanced Basic", -sp_consumed)
                 qq.tiles = 0
             if arena.sp > 7 and sparkle_ult: #Undo Sparkle's Ult if too much SP
                 action_df.df.drop(action_df.df.tail(2).index[0], inplace=True)

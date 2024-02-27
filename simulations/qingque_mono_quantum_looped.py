@@ -44,7 +44,6 @@ def QQ_Mono_Quantum(arena, qq, spk, sw, fx, action_df, stat_df, prob_df, run_num
                 action_df.add_row(arena, fx, "Skill", -1)
                 ##TODO: Add FX's 12% CR Buff:
                 fx.skill(verbose = verbose)
-  
             else:
                 action_df.add_row(arena, fx, "Basic", 1)
                 fx.basic(verbose = verbose)
@@ -57,13 +56,14 @@ def QQ_Mono_Quantum(arena, qq, spk, sw, fx, action_df, stat_df, prob_df, run_num
         #Silver Wolf's actions
             if verbose:
                 print("Silver Wolf takes a turn")
-            if arena.sp > 0 and sw.skill_counter <= 0 or spk.energy >= spk.max_energy:
+            if arena.sp > 0 or spk.energy >= spk.max_energy:
                 action_df.add_row(arena, sw, "Skill", -1)
                 sw.skill(verbose = verbose)
             else:
                 action_df.add_row(arena, sw, "Basic", 1)
                 sw.basic(verbose = verbose)
-
+            if sw.energy >= sw.max_energy:
+                sw.ult(verbose = verbose)
             sw.update_buffs()
             sw.action_reset()
 

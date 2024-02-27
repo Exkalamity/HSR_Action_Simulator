@@ -1,9 +1,8 @@
 from characters.base_character import Character
 import numpy as np
-from utils.probability_tables import make_fail_table, make_sp_table, make_state_table, make_success_table, make_transition_matrix, pd_exp, prob_at_least
-
+from utils.probability_tables import make_fail_table, make_sp_table, make_state_table, make_success_table, make_transition_matrix
 class Qingque(Character):
-  def __init__(self, behavior = "Agressive", eidolon = 6, threshold = 0.7, **kwargs):
+  def __init__(self, behavior = "Agressive", eidolon = 6, threshold = 2, **kwargs):
     super().__init__(**kwargs)
     self.name = "Qingque"
     self.max_energy = 140
@@ -15,6 +14,7 @@ class Qingque(Character):
     self.draws = None
     self.autarkey_multiplier = 1
     self.hidden_hand = True
+    self.high_roll = False
     self.behavior = behavior #Agressive, Emergency, Auto Battle
     self.eidolon = eidolon
     self.autarkey_chance = 0.25
@@ -32,15 +32,47 @@ class Qingque(Character):
     self.success_chance = None
     self.likely_multiplier = None
     self.average_multiplier = None
-    self.p_4_draw = None
-    self.p_3_draw = None
+    self.tile_df = make_transition_matrix()
+    copy = make_transition_matrix()
+    self.draw_df = self.pd_exp(copy, 2)
+    self.p_fail = None
+    self.p_high = None
+    self.p_low = None
+    self.threshold = threshold #low row < threshold, high roll >= threshold
 
-  def check_hh_w_leasts(self, sp = None, tiles = None):
+  def pd_exp(self, df, n):
+    result_df = df
+    for i in range(n):
+        if i == 0:
+            pass
+        else:
+            result_df = result_df @ df
+    return result_df
+  
+  def f_at_least(self, min):
+    arena = self.arena
+    return np.dot((self.pd_exp(self.draw_df, arena.sp) - self.pd_exp(self.draw_df, min))["4-0-0"], self.pd_exp(self.tile_df, self.tiles).T["0-0-0"][::-1])
+  
+  def f_success(self, sp):
+    if sp is None:
+      sp = self.arena.sp
+    return np.dot(self.pd_exp(self.draw_df, sp)["4-0-0"], self.pd_exp(self.tile_df, self.tiles).T["0-0-0"][::-1])
+
+  def check_hh(self, sp = None, tiles = None, threshold = None):
     arena = self.arena
     if sp is None:
       sp = int(arena.sp)
     if tiles is None:
       tiles = self.tiles
+    if threshold is None:
+       threshold = self.threshold
+    self.p_fail = 1 - self.f_success(sp)
+    if sp < threshold:
+       self.p_high = 0
+       self.p_low = self.f_success(sp)
+    else:  
+      self.p_high = self.f_at_least(threshold)
+      self.p_low = self.f_success(threshold)
   
   # def check_hh(self, sp = None, tiles = None, threshold = None):
   #   arena = self.arena

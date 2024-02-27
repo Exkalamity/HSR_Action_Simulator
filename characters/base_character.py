@@ -4,6 +4,7 @@ class Character():
   def __init__(self, arena, Base_HP = None, HPPct = None , Total_HP = None, Base_Atk = None, AtkPct = None, Total_Atk = None, Base_Def = None,
                DefPct = None, Total_Def = None, DmgPct = None, CritRate = None, CritDmg = None, Spd = None, Break = None, ER = 1.0,
                EHR = None, Res = None, E = "MoC", verbose = False):
+    self.turn = 1
     self.base_hp = Base_HP
     self.hp_percent = HPPct
     self.total_hp = Total_HP
@@ -67,6 +68,7 @@ class Character():
     if verbose == None:
       verbose = self.verbose
     self.action_gauge = self.action_value
+    self.turn +=1
     if verbose:
       print(f"{self.name}'s action gauge reset to {self.action_value}")
   

@@ -21,9 +21,16 @@ class Action_Table(Data_Table):
 class Qingque_Probability_Table(Data_Table):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.df = pd.DataFrame(columns = ["Cycle", "Action Gauge", "Current SP", "Current Tiles", "P(Success)", "Average # Skills", "Most Likely # Skills", "SP Consumed"])
-    def add_row(self, arena, chara, tiles):
-        new_row ={"Cycle":arena.cycle, "Action Gauge":arena.action_gauge, "Current SP":arena.sp, "Current Tiles":tiles, "P(Success)":chara.success_chance, 
-                    "Average # Skills":chara.average_multiplier, "Most Likely # Skills":chara.likely_multiplier, "SP Consumed":np.round(chara.likely_multiplier)}
+        self.df = pd.DataFrame(columns = ["Cycle", "Action Gauge", "Current SP", "Current Tiles", "Hidden Hand", "P(Low)", "P(High)", "QQ Draws", "QQ Roll", "SP Used"])
+    def add_row(self, arena, chara, tiles, used, hh, p):
+        new_row ={"Cycle":arena.cycle, "Action Gauge":arena.action_gauge, "Current SP":arena.sp, "Current Tiles":tiles, "Hidden Hand":hh, "P(Low)":100*chara.p_low, 
+                   "P(High)":100*chara.p_high, "QQ Draws":chara.draws,"QQ Roll":p, "SP Used":used}
         self.df = pd.concat([self.df, pd.DataFrame([new_row])], ignore_index = True)
-    
+
+class Qingque_Statistics_Table(Data_Table):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.df = pd.DataFrame(columns = ["Sim #", "Turn", "Cycle", "Action Gauge", "Current SP", "Current Tiles", "# Draws", "Hidden Hand"])
+    def add_row(self, arena, chara, sim, tiles, used):
+        new_row = {"Sim #":sim, "Turn":chara.turn, "Cycle":arena.cycle, "Action Gauge":arena.action_gauge, "Current SP":arena.sp, "Current Tiles":tiles, "# Draws":chara.draws, "Hidden Hand":chara.hidden_hand}
+        self.df = pd.concat([self.df, pd.DataFrame([new_row])], ignore_index = True)

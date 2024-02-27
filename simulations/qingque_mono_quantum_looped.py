@@ -6,12 +6,12 @@ from utils.arena import Arena
 import numpy as np
 import random as rand
 
-def QQ_Mono_Quantum(arena, qq, spk, sw, fx, action_df, prob_df, cycles = 10, verbose = False):
+def QQ_Mono_Quantum(arena, qq, spk, sw, fx, action_df, stat_df, prob_df, run_num, cycles = 10, verbose = False):
 
     if spk.tech:
         arena.sp += 3
         spk.tech = False
-    while arena.cycle < cycles:
+    while arena.cycle <= cycles:
         characters = [qq, spk, sw, fx]
         current_gauges = []
         
@@ -73,7 +73,7 @@ def QQ_Mono_Quantum(arena, qq, spk, sw, fx, action_df, prob_df, cycles = 10, ver
         #Sparkle's actions
             if verbose:
                 print("Sparkle takes a turn:")
-            if arena.sp > 0:
+            if arena.sp > 0 and spk.turn > 1 or spk.turn == 1 and spk.t1_skill == True:
                 action_df.add_row(arena, spk, "Skill", -1)
                 spk.skill(verbose = verbose)
             else:
@@ -95,18 +95,22 @@ def QQ_Mono_Quantum(arena, qq, spk, sw, fx, action_df, prob_df, cycles = 10, ver
             passive_tiles = qq.tiles
             # qq.check_hh()
             roll = rand.random()
-            print(f"P to beat is {roll}")
+            if verbose:
+                print(f"P to beat is {roll}")
             for i in range(1, arena.sp + 1):
                 check = qq.f_success(sp = i)
-                print(f"Did QQ win with {check}?")
+                if verbose:
+                    print(f"Did QQ win with {check}?")
                 if roll < check:
                     sp_consumed = i
                     qq.hidden_hand = True
-                    print("Success!")
-                    print(f"Draws = {i}")
+                    if verbose:
+                        print("Success!")
+                        print(f"Draws = {i}")
                     break
             else:
-                print("Failure!")
+                if verbose:
+                    print("Failure!")
                 sp_consumed = int(arena.sp)
                 if qq.eidolon == 6:
                     sp_consumed +=1
@@ -127,8 +131,10 @@ def QQ_Mono_Quantum(arena, qq, spk, sw, fx, action_df, prob_df, cycles = 10, ver
                     sp_consumed -= 1
                 action_df.add_row(arena, qq, "Enhanced Basic", sp_consumed)
                 qq.tiles = 0
-            prob_df.add_row(arena, qq, passive_tiles, sp_consumed, qq.hidden_hand, roll)
-            print(f"SP Consumed = {sp_consumed}")
+            stat_df.add_row(arena, qq, run_num, passive_tiles, sp_consumed)
+            #prob_df.add_row(arena, qq, passive_tiles, sp_consumed, qq.hidden_hand, roll)
+            if verbose:
+                print(f"SP Consumed = {sp_consumed}")
             arena.sp -= sp_consumed
             #qq.update_buffs(verbose)
             qq.action_reset()
@@ -143,10 +149,10 @@ def QQ_Mono_Quantum(arena, qq, spk, sw, fx, action_df, prob_df, cycles = 10, ver
 
 
 
-def Initialize_QQ_Mono_Quantum(qingque_speed = None, silver_wolf_speed = None, fu_xuan_speed = None, sparkle_speed = None):
+def Initialize_QQ_Mono_Quantum(qingque_speed = None, silver_wolf_speed = None, fu_xuan_speed = None, sparkle_speed = None, bronya_lc = False, sparkle_turn_1_skill = True):
   arena = Arena()
   QQ = Qingque(arena = arena, Spd = qingque_speed)
   SW = Silver_Wolf(arena = arena, Spd = silver_wolf_speed)
   FX = Fu_Xuan(arena = arena, tech = True, Spd = fu_xuan_speed, ER = 1.194)
-  Spk = Sparkle(arena = arena, recipient = QQ, Spd = sparkle_speed, ER = 1.194, tech = True)
+  Spk = Sparkle(arena = arena, recipient = QQ, Spd = sparkle_speed, ER = 1.194, tech = True, broyna_lc=bronya_lc, t1_skill= sparkle_turn_1_skill)
   return arena, QQ, Spk, SW, FX

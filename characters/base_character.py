@@ -1,10 +1,13 @@
 import numpy as np
+import pandas as pd
+from utils.data_table import Buff_Table
 
 class Character():
   def __init__(self, arena, Base_HP = None, HPPct = None , Total_HP = None, Base_Atk = None, AtkPct = None, Total_Atk = None, Base_Def = None,
                DefPct = None, Total_Def = None, DmgPct = None, CritRate = None, CritDmg = None, Spd = None, Break = None, ER = 1.0,
                EHR = None, Res = None, E = "MoC", verbose = False):
     self.turn = 1
+    self.buffs = Buff_Table()
     self.base_hp = Base_HP
     self.hp_percent = HPPct
     self.total_hp = Total_HP
@@ -43,26 +46,21 @@ class Character():
     self.energy = E
     self.verbose = verbose
     self.arena = arena
-    self.buffs_list = [] #Store buffs as a list of dictionaries: {name:"attribute_name", giver:"character name", value:value, duration:duration}
-    try:
-      self.flat_attack = self.total_attack - self.base_attack - self.base_attack*self.attack_percent
-    except TypeError:
-      if self.verbose:
-        print(f"Cannot calculate character attack due to invalid values for base attack, attack percent, and/or total attack")
+  
   def action_advance(self, AG, verbose = None):
     self.action_gauge -= AG
-  def update_buffs(self, verbose = None): #function for counting down buffs from other characters
-    if verbose is None:
-      verbose = self.verbose
-    for buff in self.buffs_list.copy():
-      buff["duration"] -= 1
-      if buff["duration"] <1:
-        current_value = getattr(buff["tickdown"], buff["attribute name"])
-        setattr(buff["tickdown"], buff["attribute name"], current_value - buff["value"])
-        if verbose:
-          print(f"{buff['recipient'].name}'s {buff['value']*100}% {buff['attribute name']} removed")
-        self.buffs_list.remove(buff)
-    self.update_stats()
+  # def update_buffs(self, verbose = None): #function for counting down buffs from other characters
+  #   if verbose is None:
+  #     verbose = self.verbose
+  #   for buff in self.buffs_list.copy():
+  #     buff["duration"] -= 1
+  #     if buff["duration"] <1:
+  #       current_value = getattr(buff["tickdown"], buff["attribute name"])
+  #       setattr(buff["tickdown"], buff["attribute name"], current_value - buff["value"])
+  #       if verbose:
+  #         print(f"{buff['recipient'].name}'s {buff['value']*100}% {buff['attribute name']} removed")
+  #       self.buffs_list.remove(buff)
+  #   self.update_stats()
   
   def action_reset(self, verbose = None):
     if verbose == None:
@@ -98,3 +96,22 @@ class Character():
       res = 0.8
     res -= res_shred
     return base_damage * dmg_multiplier * def_mult * res * self.crit_damage
+  
+  ##Delete Later?
+# class Base_Buff():
+#   def __init__(self, name, holder_name, source_name, recipient_name, stat, amount, remaining_turns):
+#     self.name = name
+#     self.holder_name = holder_name
+#     self.source_name = source_name
+#     self.recipient_name = recipient_name
+#     self.stat= stat
+#     self.amount = amount
+#     self.remaining_turns = remaining_turns
+#     self.input = {"Name":name, "Holder Name":holder_name, "Source Name":source_name, "Recipient Name":recipient_name, 
+#              "Stat":stat, "Amount":amount, "Remaining Turns":remaining_turns}
+#     self.new_row = pd.DataFrame.from_dict(input)
+  
+#   def update_buff(self):
+#     self.input = {"Name":self.name, "Holder Name":self.holder_name, "Source Name":self.source_name, 
+#                   "Recipient Name":self.recipient_name, "Stat":self.stat, "Amount":self.amount, "Remaining Turns":self.remaining_turns}
+#     self.new_row = pd.DataFrame.from_dict(input)
